@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Interactive Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Header (kept from the original) -->
+    <h1 class="title">Hello World!</h1>
+
+    <!-- Clock (unchanged) -->
+    <p id="currentTime"></p>
+
+    <!-- ---------- PART 2 – Interactive Elements ---------- -->
+    <!-- Light/Dark mode toggle -->
+    <button id="themeToggle">🌙 Dark mode</button>
+
+    <!-- Simple counter -->
+    <div class="counter">
+      <button id="decrement">–</button>
+      <span id="count">0</span>
+      <button id="increment">+</button>
+    </div>
+
+    <!-- Collapsible FAQ -->
+    <section class="faq">
+      <h2>FAQ</h2>
+      <details>
+        <summary>What is this page about?</summary>
+        <p>It demonstrates event handling, interactive UI, and form validation.</p>
+      </details>
+      <details>
+        <summary>How does the dark‑mode work?</summary>
+        <p>Click the button above – a CSS class is toggled on <code>body</code>.</p>
+      </details>
+    </section>
+
+    <!-- ---------- PART 3 – Form Validation ---------- -->
+    <section class="form-section">
+      <h2>Sign‑up Form</h2>
+      <form id="signupForm" novalidate>
+        <label>
+          Name:
+          <input type="text" name="name" id="name" required />
+        </label>
+        <small class="error" id="nameError"></small>
+
+        <label>
+          Email:
+          <input type="email" name="email" id="email" required />
+        </label>
+        <small class="error" id="emailError"></small>
+
+        <label>
+          Password:
+          <input type="password" name="password" id="password" required />
+        </label>
+        <small class="error" id="passError"></small>
+
+        <button type="submit">Register</button>
+        <p class="success" id="formSuccess"></p>
+      </form>
+    </section>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+styles.css
+/* Basic layout */
+body {
+  padding: 25px;
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  transition: background 0.3s, color 0.3s;
+}
+.title {
+  color: #5c6ac4;
+}
+
+/* Dark‑mode colors */
+body.dark {
+  background: #222;
+  color: #eee;
+}
+body.dark .title {
+  color: #ffcc00;
+}
+
+/* Clock */
+#currentTime {
+  margin-bottom: 20px;
+}
+
+/* Counter */
+.counter {
+  margin: 20px 0;
+  font-size: 1.2rem;
+}
+.counter button {
+  width: 30px;
+  height: 30px;
+  margin: 0 5px;
+}
+
+/* FAQ */
+.faq details {
+  margin: 10px 0;
+}
+
+/* Form styling */
+.form-section {
+  margin-top: 30px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+}
+label {
+  margin-bottom: 10px;
+}
+input {
+  width: 100%;
+  padding: 5px;
+  margin-top: 3px;
+}
+button[type="submit"] {
+  margin-top: 10px;
+  padding: 8px;
+}
+.error {
+  color: #d00;
+  font-size: 0.85rem;
+  height: 1em;
+}
+.success {
+  color: #080;
+  margin-top: 10px;
+}
+script.js
+/* -------------------------------------------------
+   Part 1 – Clock (original functionality)
+   ------------------------------------------------- */
+function showTime() {
+  document.getElementById('currentTime').innerHTML = new Date().toUTCString();
+}
+showTime();
+setInterval(showTime, 1000);
+
+/* -------------------------------------------------
+   Part 2 – Interactive Features
+   ------------------------------------------------- */
+
+/* 2.1 Light/Dark mode toggle */
+const themeBtn = document.getElementById('themeToggle');
+themeBtn.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  // Update button label for clarity
+  themeBtn.textContent = document.body.classList.contains('dark')
+    ? '☀️ Light mode'
+    : '🌙 Dark mode';
+});
+
+/* 2.2 Simple counter */
+let count = 0;
+const countSpan = document.getElementById('count');
+document.getElementById('increment').addEventListener('click', () => {
+  count++;
+  countSpan.textContent = count;
+});
+document.getElementById('decrement').addEventListener('click', () => {
+  count--;
+  countSpan.textContent = count;
+});
+
+/* -------------------------------------------------
+   Part 3 – Form Validation
+   ------------------------------------------------- */
+const form = document.getElementById('signupForm');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const passInput = document.getElementById('password');
+
+const nameErr = document.getElementById('nameError');
+const emailErr = document.getElementById('emailError');
+const passErr = document.getElementById('passError');
+const successMsg = document.getElementById('formSuccess');
+
+/* Helper: show error */
+function setError(elem, msg) {
+  elem.textContent = msg;
+}
+
+/* Helper: clear all errors */
+function clearErrors() {
+  nameErr.textContent = '';
+  emailErr.textContent = '';
+  passErr.textContent = '';
+  successMsg.textContent = '';
+}
+
+/* Validation logic */
+function validateName(name) {
+  return name.trim().length >= 2;
+}
+function validateEmail(email) {
+  // Simple RFC‑5322‑ish regex
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+function validatePassword(pwd) {
+  // At least 6 chars, one number, one letter
+  const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+  return re.test(pwd);
+}
+
+/* Form submit handler */
+form.addEventListener('submit', (e) => {
+  e.preventDefault();          // stop native submit
+  clearErrors();
+
+  const nameVal = nameInput.value;
+  const emailVal = emailInput.value;
+  const passVal = passInput.value;
+
+  let valid = true;
+
+  if (!validateName(nameVal)) {
+    setError(nameErr, 'Name must be at least 2 characters.');
+    valid = false;
+  }
+  if (!validateEmail(emailVal)) {
+    setError(emailErr, 'Enter a valid email address.');
+    valid = false;
+  }
+  if (!validatePassword(passVal)) {
+    setError(passErr, 'Password: min 6 chars, at least 1 letter & 1 number.');
+    valid = false;
+  }
+
+  if (valid) {
+    successMsg.textContent = '✅ Registration successful!';
+    // Here you could send data via fetch/AJAX
+    form.reset();
+  }
+});
+
+/* Optional: live validation while typing */
+[nameInput, emailInput, passInput].forEach((field) => {
+  field.addEventListener('input', () => {
+    // Clear the specific error as the user types
+    const errElem = document.getElementById(field.id + 'Error');
+    errElem.textContent = '';
+    successMsg.textContent = '';
+  });
+});
